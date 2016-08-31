@@ -28,7 +28,7 @@ module: yum_repo_enabler
 extends_documentation_fragment: files
 description:
     - Enables/disables repository files contained in a yum directory.
-version_added: 1.1
+version_added: 2.1
 options:
     directory:
         description:
@@ -61,6 +61,21 @@ EXAMPLES = '''
       name=custom
       enabled=False
       directory='/tmp/custom'
+'''
+
+RETURN = '''
+directory:
+    description: target directory to search for .repo files
+    returned: always
+    type: string
+    sample: '/etc/yum.repos.d'
+
+changed:
+    description: state of whether repo has been altered
+    returned: always
+    type: bool
+    sample: true
+
 '''
 
 def do_yum_enable(check_mode, directory, name, enabled):
