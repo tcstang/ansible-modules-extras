@@ -102,23 +102,25 @@ def do_yum_enable(check_mode, directory, name, enabled):
         # look for unique repository name
         for file in files_to_check:
             config = ConfigParser.ConfigParser()
-            config_in = open(file)
             try:
-                config.readfp(config_in)
-                if config.get(name, 'enabled') == enabled:
-                    msg = 'OK'
-                else:
-                    config.set(name, 'enabled', enabled)
-                    repo_changed = True
-                    msg = "Yum repository " + name + " has successfully been changed"
-                    if not check_mode:
-                        write_config_to_file(config, file)
-                repo_found = True
-                break
+                config_in = open(file)
+                # nested try for python 2.4 try-finally compatability
+                try:
+                    config.readfp(config_in)
+                    if config.get(name, 'enabled') == enabled:
+                        msg = 'OK'
+                    else:
+                        config.set(name, 'enabled', enabled)
+                        repo_changed = True
+                        msg = "Yum repository " + name + " has successfully been changed"
+                        if not check_mode:
+                            write_config_to_file(config, file)
+                    repo_found = True
+                    break
+                finally:
+                    config_in.close()
             except NoSectionError:
                 continue
-            finally:
-                config_in.close()
     return (repo_changed, repo_found, msg)
 
 def main():
