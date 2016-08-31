@@ -78,6 +78,13 @@ changed:
 
 '''
 
+def write_config_to_file(config, file):
+    config_out = open(file, 'wb')
+    try:
+        config.write(config_out)
+    finally:
+        config_out.close()
+
 def do_yum_enable(check_mode, directory, name, enabled):
     repo_found = False
     repo_changed = False
@@ -95,22 +102,23 @@ def do_yum_enable(check_mode, directory, name, enabled):
         # look for unique repository name
         for file in files_to_check:
             config = ConfigParser.ConfigParser()
+            config_in = open(file)
             try:
-                with open(file) as config_in:
-                    config.readfp(config_in)
-                    if config.get(name, 'enabled') == enabled:
-                        msg = 'OK'
-                    else:
-                        config.set(name, 'enabled', enabled)
-                        repo_changed = True
-                        msg = "Yum repository " + name + " has successfully been changed"
-                        if not check_mode:
-                            with open(file, 'wb') as config_out:
-                                config.write(config_out)
-                    repo_found = True
-                    break
+                config.readfp(config_in)
+                if config.get(name, 'enabled') == enabled:
+                    msg = 'OK'
+                else:
+                    config.set(name, 'enabled', enabled)
+                    repo_changed = True
+                    msg = "Yum repository " + name + " has successfully been changed"
+                    if not check_mode:
+                        write_config_to_file(config, file)
+                repo_found = True
+                break
             except NoSectionError:
                 continue
+            finally:
+                config_in.close()
     return (repo_changed, repo_found, msg)
 
 def main():
