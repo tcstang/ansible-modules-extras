@@ -28,7 +28,7 @@ module: yum_repo_enabler
 extends_documentation_fragment: files
 description:
     - Enables/disables repository files contained in a yum directory.
-version_added: 2.1
+version_added: 2.2
 options:
     directory:
         description:
